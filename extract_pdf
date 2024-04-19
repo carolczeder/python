@@ -1,0 +1,34 @@
+import os
+import shutil
+import sys  # Import the sys module
+def gather_pdfs(src_folder):
+    # Get the absolute path of the source folder
+    src_folder_abs = os.path.abspath(src_folder)
+    # Define the destination folder name by appending '-all-pdfs' to the source folder name
+    dest_folder = f"{src_folder_abs}-all-pdfs"
+    # Create the destination folder if it doesn't exist
+    os.makedirs(dest_folder, exist_ok=True)
+    # Walk through all directories and files in the source folder
+    for root, dirs, files in os.walk(src_folder_abs):
+        for file in files:
+            # Check if the file is a PDF
+            if file.lower().endswith('.pdf'):
+                # Calculate relative path from src_folder to the current file's folder
+                relative_path = os.path.relpath(root, src_folder_abs)
+                # Replace os path separators with dashes for the new file name
+                if relative_path != ".":
+                    new_file_name = f"{relative_path.replace(os.sep, '-')}-{file}"
+                else:
+                    new_file_name = file
+                # Define the source and destination paths for the file
+                src_path = os.path.join(root, file)
+                dest_path = os.path.join(dest_folder, new_file_name)
+                # Copy the file to the destination folder
+                shutil.copy2(src_path, dest_path)
+                print(f"Copied: {src_path} to {dest_path}")
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        folder_path = sys.argv[1]
+        gather_pdfs(folder_path)
+    else:
+        print("Usage: python script_name.py <folder_path>")
